@@ -10,7 +10,6 @@ class Reader extends AbstractBase
     public function __construct($path, $mode = 'r+')
     {
         parent::__construct($path, $mode);
-        $this->_headers = $this->getRow();
         $this->_line    = 0;
     }
 
@@ -18,13 +17,17 @@ class Reader extends AbstractBase
     {
         if (($row = fgetcsv($this->_handle, 4096, $this->_delimiter, $this->_enclosure)) !== false) {
             $this->_line++;
-            try
-            {
-              $ret = $this->_headers ? array_combine($this->_headers, $row) : $row;
-            } catch (\ErrorException $e) {
-              $ret = $row;
+            if (empty($this->_headers)) {
+              $this->_headers = $row;
+              return $this->getRow();
+            } else {
+              try {
+                $ret = array_combine($this->_headers, $row);
+              } catch (\ErrorException $e) {
+                $ret = $row;
+              }
+              return $ret;
             }
-            return $ret;
         } else {
             return false;
         }
