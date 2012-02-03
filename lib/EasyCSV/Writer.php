@@ -16,9 +16,12 @@ class Writer extends AbstractBase
             $row = explode(',', $row);
             $row = array_map('trim', $row);
         }
-        $row = array_map(function($key) {
-            return mb_check_encoding($key, 'UTF-8') ? $key : utf8_encode($key);
-        }, $row);
+
+        if ($this->getForceUtf8()) {
+            $row = array_map(function($key) {
+                return mb_check_encoding($key, 'UTF-8') ? $key : utf8_encode($key);
+            }, $row);
+        }
         if ($this->_line == 0) {
           fputcsv($this->_handle, array_keys($row), $this->_delimiter, $this->_enclosure);
         }
