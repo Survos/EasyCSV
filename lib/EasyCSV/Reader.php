@@ -6,6 +6,7 @@ class Reader extends AbstractBase
 {
     private $_headers;
     private $_line;
+    private $_as_array=false;
 
     public function __construct($path, $mode = 'r+')
     {
@@ -17,7 +18,7 @@ class Reader extends AbstractBase
     {
         if (($row = fgetcsv($this->_handle, 4096, $this->_delimiter, $this->_enclosure)) !== false) {
             $this->_line++;
-            if (empty($this->_headers)) {
+            if (empty($this->_headers) || $this->as_array()) {
               $this->_headers = $row;
               return $this->getRow();
             } else {
@@ -45,5 +46,9 @@ class Reader extends AbstractBase
     public function getLineNumber()
     {
         return $this->_line;
+    }
+
+    public function setAsArray($as_array) {
+      $this->_as_array = $as_array;
     }
 }
