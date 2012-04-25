@@ -1,0 +1,9 @@
+{
+    "name": "survos/easycsv",
+    "description": "Set of PHP 5.3 classes for reading and writing CSV files.",
+    "autoload": {
+        "psr-0": {
+            "EasyCSV": "lib/"
+        }
+    }
+}
