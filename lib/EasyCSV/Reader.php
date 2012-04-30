@@ -18,7 +18,9 @@ class Reader extends AbstractBase
     {
         if (($row = fgetcsv($this->_handle, 4096, $this->_delimiter, $this->_enclosure)) !== false) {
             $this->_line++;
-            if (empty($this->_headers) || $this->asArray()) {
+            if ($this->asArray()) {
+              return $row;
+            } elseif (empty($this->_headers) ) {
               $this->_headers = $row;
               return $this->getRow();
             } else {
