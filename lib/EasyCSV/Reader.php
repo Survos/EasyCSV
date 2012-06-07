@@ -7,6 +7,7 @@ class Reader extends AbstractBase
     private $_headers;
     private $_line;
     private $_as_array=false;
+    private $_has_error = false;
 
     public function __construct($path, $mode = 'r+')
     {
@@ -16,6 +17,7 @@ class Reader extends AbstractBase
 
     public function getRow()
     {
+        $this->_has_error = false;
         if (($row = fgetcsv($this->_handle, 4096, $this->_delimiter, $this->_enclosure)) !== false) {
             if ($this->getForceUtf8()) {
               $row = array_map(function($key) {
@@ -28,8 +30,15 @@ class Reader extends AbstractBase
               return $row;
             } elseif (empty($this->_headers) ) {
               $this->_headers = $row;
+              $this->_header_count = count($row);
               return $this->getRow();
             } else {
+              if (count($row) <> $this->_header_count) {
+                $this->_has_error = true;
+                $this->_error = "Bad Data, wrong number of rows";
+                // throw new \Exception("Bad Data, wrong number of rows");
+                return $row;
+              }
               try {
                 $ret = array_combine($this->_headers, $row);
               } catch (\ErrorException $e) {
@@ -40,6 +49,14 @@ class Reader extends AbstractBase
         } else {
             return false;
         }
+    }
+
+    public function hasError() {
+      return $this->_has_error;
+    }
+
+    public function getError() {
+      return $this->_error;
     }
 
     public function getAll()
