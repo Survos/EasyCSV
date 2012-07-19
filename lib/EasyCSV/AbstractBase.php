@@ -8,6 +8,7 @@ abstract class AbstractBase
     protected $_delimiter = ',';
     protected $_enclosure = '"';
     protected $_force_utf8 = false;
+    protected $_path;
 
     public function __construct($path, $mode = 'r+')
     {
@@ -15,6 +16,7 @@ abstract class AbstractBase
             touch($path);
         }
         $this->_handle = fopen($path, $mode);
+        $this->_path = $path;
     }
 
     public function __destruct()
@@ -37,5 +39,9 @@ abstract class AbstractBase
     public function getForceUtf8($force_utf8=true)
     {
       return $this->_force_utf8;
+    }
+
+    public function getPath() {
+      return $this->_path;
     }
 }
