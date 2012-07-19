@@ -23,10 +23,17 @@ class Writer extends AbstractBase
             }, $row);
         }
         if ($this->_line == 0) {
-          fputcsv($this->_handle, array_keys($row), $this->_delimiter, $this->_enclosure);
+            $columns = array_keys($row);
+            $this->_defaults = array_fill_keys($columns, '');
+            fputcsv($this->_handle, $columns, $this->_delimiter, $this->_enclosure);
         }
         $this->_line++;
-        return fputcsv($this->_handle, $row, $this->_delimiter, $this->_enclosure);
+        $unexpected = array_diff(array_keys($row), array_keys($this->_defaults));
+        if ($unexpected) {
+            throw new \Exception(sprintf('Unexpected column%s found in line %d: %s',
+                count($unexpected) == 1 ? '' : 's', $this->_line, implode(', ', $unexpected)));
+        }
+        return fputcsv($this->_handle, array_merge($this->_defaults, $row), $this->_delimiter, $this->_enclosure);
     }
 
     public function writeFromArray(array $array)
