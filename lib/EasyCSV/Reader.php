@@ -1,6 +1,7 @@
 <?php
 
 namespace EasyCSV;
+use EasyCSV\Field;
 
 class Reader extends AbstractBase
 {
@@ -30,6 +31,7 @@ class Reader extends AbstractBase
               return $row;
             } elseif (empty($this->_headers) ) {
               $this->_headers = $row;
+              $this->createFields($row);
               $this->_header_count = count($row);
               return $this->getRow();
             } else {
@@ -41,14 +43,58 @@ class Reader extends AbstractBase
               }
               try {
                 $ret = array_combine($this->_headers, $row);
+                // go through each field and and see what we can learn.
+                foreach ($this->fields as $fieldname=>$field) {
+                     $field->check($row[$field->idx]);
+                }
               } catch (\ErrorException $e) {
                 $ret = $row;
               }
+
               return $ret;
             }
         } else {
             return false;
         }
+    }
+
+    // create $this->field based on header names
+    function createFields($data) {
+    $fields = array();
+    $possible_points = array();
+    // we need to preserve column name, for compatibility with EasyCSV.
+    for ($c=0; $c < count($data); $c++) {
+        $column_name = $data[$c];
+        $field_name = \Survos\Lib\tt::display_to_code(
+            // insert underscores before camel caps
+            preg_replace('/(?<=[a-z])(?=[A-Z])/', '_', $column_name)
+        );
+        $i = 1;
+        $original_field_name = $field_name;
+        while (isset($fields[$field_name])) {
+            $i++;
+            $field_name = $original_field_name . '_' . $i;
+        }
+    	$fields[$field_name] =  new field($field_name, $column_name, $c);
+    	/* old code allowed presetting fieldtypes
+    	  empty($this->datatypes[$field_name]) ? null :
+    	    $this->datatypes[$field_name]['type']);
+    	*/
+        $this->csv_field_count = count($fields); //
+        // check for possible point fields
+        if (preg_match('{(.*?)_?(latitude|longitude)}', $field_name, $m)) {
+            $point_fieldname = $m[1] ?: 'location';
+
+            $possible_points[$point_fieldname][$m[2]] = $field_name;
+        }
+
+    }
+    return $this->fields = $fields;
+    }
+
+    public function getFields()
+    {
+        return $this->fields;
     }
 
     public function hasError() {
