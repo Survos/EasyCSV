@@ -30,6 +30,17 @@ class Reader extends AbstractBase
             if ($this->asArray()) {
               return $row;
             } elseif (empty($this->_headers) ) {
+              if ($this->_codified_fields)
+              {
+                    foreach ($row as $idx=>$column_name)
+                    {
+                        $row[$idx] =  \Survos\Lib\tt::display_to_code(
+                    // insert underscores before camel caps
+                    preg_replace('/(?<=[a-z])(?=[A-Z])/', '_', $column_name)
+            );
+
+                    }
+              }
               $this->_headers = $row;
               $this->createFields($row);
               $this->_header_count = count($row);
