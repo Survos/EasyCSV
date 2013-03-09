@@ -1,11 +1,11 @@
 <?php
 
 namespace EasyCSV;
+
 use EasyCSV\Field;
 
 class Reader extends AbstractBase
 {
-    private $_headers;
     private $_line;
     private $_as_array=false;
     private $_has_error = false;

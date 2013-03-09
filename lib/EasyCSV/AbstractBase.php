@@ -10,6 +10,7 @@ abstract class AbstractBase
     protected $_force_utf8 = false;
     protected $_codified_fields = false;
     protected $_path;
+    protected $_headers;
 
     public function __construct($path, $mode = 'r+')
     {
@@ -49,5 +50,14 @@ abstract class AbstractBase
 
     public function getPath() {
       return $this->_path;
+    }
+
+    // set the header when the first line doesn't have the field names.
+    public function setHeader($header)
+    {
+        $this->_headers = $header;
+        $this->createFields($header);
+        $this->_header_count = count($header);
+
     }
 }
