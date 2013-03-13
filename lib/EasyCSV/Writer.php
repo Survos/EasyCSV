@@ -22,6 +22,12 @@ class Writer extends AbstractBase
                 return mb_check_encoding($key, 'UTF-8') ? $key : utf8_encode($key);
             }, $row);
         }
+
+            $row = array_map(function($key) {
+                return is_a($key, 'DateTime') ? $key->format('c') : $key;
+            }, $row);
+
+        // fix the DateTime object
         if ($this->_line == 0) {
             $columns = array_keys($row);
             $this->_defaults = array_fill_keys($columns, '');
