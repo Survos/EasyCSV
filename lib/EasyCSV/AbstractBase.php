@@ -33,6 +33,11 @@ abstract class AbstractBase
       $this->_delimiter = $delimiter;
     }
 
+    public function setEnclosure($enclosure='')
+    {
+      $this->_enclosure = $enclosure;
+    }
+
     public function setForceUtf8($force_utf8=true)
     {
       $this->_force_utf8 = $force_utf8;
