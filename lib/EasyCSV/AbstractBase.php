@@ -9,6 +9,7 @@ abstract class AbstractBase
     protected $_enclosure = '"';
     protected $_force_utf8 = false;
     protected $_codified_fields = false;
+    protected $_fix_escaped = true;
     protected $_path;
     protected $_headers;
 
@@ -48,6 +49,11 @@ abstract class AbstractBase
       $this->_codified_fields = $bool;
     }
 
+    public function setFixEscaped($bool=true)
+    {
+      $this->_fix_escaped = $bool;
+    }
+
     public function getForceUtf8($force_utf8=true)
     {
       return $this->_force_utf8;
@@ -55,6 +61,10 @@ abstract class AbstractBase
 
     public function getPath() {
       return $this->_path;
+    }
+
+    public function getFixEscaped() {
+      return $this->_fix_escaped;
     }
 
     // set the header when the first line doesn't have the field names.

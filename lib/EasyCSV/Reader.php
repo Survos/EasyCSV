@@ -26,6 +26,12 @@ class Reader extends AbstractBase
               }, $row);
             }
 
+            if ($this->getFixEscaped()) {
+              $row = array_map(function($key) {
+                return str_replace(array('\t','\n'), array("\t", "\n"), $key);
+              }, $row);
+            }
+
             $this->_line++;
             if ($this->asArray()) {
               return $row;
