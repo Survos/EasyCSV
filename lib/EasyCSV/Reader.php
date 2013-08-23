@@ -40,11 +40,8 @@ class Reader extends AbstractBase
               {
                     foreach ($row as $idx=>$column_name)
                     {
-                        $row[$idx] =  \Survos\Lib\tt::display_to_code(
-                    // insert underscores before camel caps
-                    preg_replace('/(?<=[a-z])(?=[A-Z])/', '_', $column_name)
-            );
-
+		                    $y = preg_replace('/(?<=[a-z])(?=[A-Z])/', '_', $column_name);
+                        $row[$idx] =  str_replace('-', '_', \Survos\Lib\tt::name_to_code($y));
                     }
               }
               $this->_headers = $row;
