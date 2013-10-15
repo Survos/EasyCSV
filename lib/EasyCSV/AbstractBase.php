@@ -18,9 +18,32 @@ abstract class AbstractBase
         if ( ! file_exists($path)) {
             touch($path);
         }
-        $this->_handle = fopen($path, $mode);
+
+        $this->setDelimiter($this->detectDelimiter($path));
         $this->_path = $path;
+        $this->_handle = fopen($path, $mode);
+
     }
+
+    protected function detectDelimiter($fn) {
+        $handle = @fopen($fn, "r");
+        $default = ',';
+        if ($handle) {
+            $line=fgets($handle, 4096);
+            fclose($handle);
+
+            foreach (array("\t", '|') as $candidate) {
+                if (substr_count($line, "\t")) {
+                    return  $candidate;
+                }
+            }
+            //.. and so on
+        }
+        //return default delimiter
+        return $default;
+    }
+
+
 
     public function __destruct()
     {
