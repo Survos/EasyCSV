@@ -43,7 +43,10 @@ abstract class AbstractBase
         return $default;
     }
 
-
+    function getBasename()
+    {
+        return basename($this->_path);
+    }
 
     public function __destruct()
     {
