@@ -36,12 +36,16 @@ class Reader extends AbstractBase
             if ($this->asArray()) {
               return $row;
             } elseif (empty($this->_headers) ) {
-              if ($this->_codified_fields)
+              if ($this->_codified_fields <> AbstractBase::FIELDNAME_PRESERVE)
               {
                     foreach ($row as $idx=>$column_name)
                     {
 		                    $y = preg_replace('/(?<=[a-z])(?=[A-Z])/', '_', $column_name);
                         $row[$idx] =  str_replace('-', '_', \Survos\Lib\tt::name_to_code($y));
+                        if ($this->_codified_fields == AbstractBase::FIELDNAME_NO_SYMBOLS)
+                        {
+                            $row[$idx] =  str_replace('_', '', $row[$idx]);
+                        }
                     }
               }
               $this->_headers = $row;

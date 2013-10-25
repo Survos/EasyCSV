@@ -13,6 +13,12 @@ abstract class AbstractBase
     protected $_path;
     protected $_headers;
 
+    const FIELDNAME_PRESERVE = 0;
+    const FIELDNAME_UNDERSCORE = 1;
+    const FIELDNAME_CAMELCAP = 2;
+    const FIELDNAME_NO_SYMBOLS = 3;
+
+
     public function __construct($path, $mode = 'r+')
     {
         if ( ! file_exists($path)) {
@@ -70,9 +76,13 @@ abstract class AbstractBase
       $this->_force_utf8 = $force_utf8;
     }
 
-    public function setCodifiedFields($bool=true)
+    public function setCodifiedFields($setting=null)
     {
-      $this->_codified_fields = $bool;
+      if (is_null($setting) || $setting === true)
+      {
+          $setting = AbstractBase::FIELDNAME_UNDERSCORE;
+      }
+      $this->_codified_fields = $setting;
     }
 
     public function setFixEscaped($bool=true)
