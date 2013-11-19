@@ -23,11 +23,15 @@ class Writer extends AbstractBase
             }, $row);
         }
 
+        // fix the DateTime object and arrays
             $row = array_map(function($key) {
-                return is_a($key, 'DateTime') ? $key->format('c') : $key;
+                switch (gettype($key)) {
+                    case 'DateTime': return $key->format('c');
+                    case 'array': return \Survos\Lib\tt::is_numeric_array($key) ? join("|", $key) : json_encode($key);
+                    default: return $key;
+                }
             }, $row);
 
-        // fix the DateTime object
         if ($this->_line == 0) {
             $columns = array_keys($row);
             $this->_defaults = array_fill_keys($columns, '');

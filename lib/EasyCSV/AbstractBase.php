@@ -23,6 +23,9 @@ abstract class AbstractBase
     {
         if ( ! file_exists($path)) {
             touch($path);
+            if (substr($mode, 0, 1) == 'w') {
+                chmod($path, 0775); // make group writable
+            }
         }
 
         $this->setDelimiter($this->detectDelimiter($path));
