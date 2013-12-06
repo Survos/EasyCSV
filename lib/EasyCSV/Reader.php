@@ -20,6 +20,11 @@ class Reader extends AbstractBase
     {
         $this->_has_error = false;
         if (($row = fgetcsv($this->_handle, 4096, $this->_delimiter, $this->_enclosure)) !== false) {
+
+            $row = array_map(function($key) {
+                return trim($key);
+            }, $row);
+
             if ($this->getForceUtf8()) {
               $row = array_map(function($key) {
                 return mb_check_encoding($key, 'UTF-8') ? $key : utf8_encode($key);
