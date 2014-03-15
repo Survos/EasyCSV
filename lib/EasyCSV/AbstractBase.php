@@ -8,6 +8,7 @@ abstract class AbstractBase
     protected $_delimiter = ',';
     protected $_enclosure = '"';
     protected $_force_utf8 = false;
+    protected $_unnamed_extra_data_var = false;
     protected $_codified_fields = false;
     protected $_fix_escaped = true;
     protected $_path;
@@ -77,6 +78,11 @@ abstract class AbstractBase
     public function setForceUtf8($force_utf8=true)
     {
       $this->_force_utf8 = $force_utf8;
+    }
+
+    public function setUnnamedExtraDataVar($v)
+    {
+        $this->_unnamed_extra_data_var = $v;
     }
 
     public function setCodifiedFields($setting=null)

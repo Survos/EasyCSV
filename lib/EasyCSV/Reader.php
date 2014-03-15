@@ -59,10 +59,18 @@ class Reader extends AbstractBase
               return $this->getRow();
             } else {
               if (count($row) <> $this->_header_count) {
-                $this->_has_error = true;
-                $this->_error = "Bad Data, wrong number of rows";
-                // throw new \Exception("Bad Data, wrong number of rows");
-                return $row;
+                if ($this->_unnamed_extra_data_var) {
+                    $normal = array_slice($row, 0, $this->_header_count);
+                    $ret = array_combine($this->_headers, $normal);
+                    $ret[$this->_unnamed_extra_data_var] = array_slice($row, $this->_header_count);
+                    return $ret;
+
+                } else {
+                    $this->_has_error = true;
+                    $this->_error = "Bad Data, wrong number of rows";
+                    // throw new \Exception("Bad Data, wrong number of rows");
+                    return $row;
+                }
               }
               try {
                 $ret = array_combine($this->_headers, $row);
@@ -70,6 +78,19 @@ class Reader extends AbstractBase
                 foreach ($this->fields as $fieldname=>$field) {
                      $field->check($row[$field->idx]);
                 }
+                // now go through all the fields that are named "" and add them to extra
+                  $unnamed = [];
+                  if ($this->_unnamed_extra_data_var) {
+                      foreach ($this->_headers as $idx=>$columnName) {
+                          if (empty($columnName)) {
+                              if ($row[$idx] != '') {
+                                  $unnamed[] = $row[$idx];
+                              }
+                          }
+                      }
+                      $ret[$this->_unnamed_extra_data_var] = $unnamed;
+                  }
+
               } catch (\ErrorException $e) {
                 $ret = $row;
               }
