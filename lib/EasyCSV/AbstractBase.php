@@ -80,7 +80,7 @@ abstract class AbstractBase
       $this->_force_utf8 = $force_utf8;
     }
 
-    public function setUnnamedExtraDataVar($v)
+        public function setUnnamedExtraDataVar($v)
     {
         $this->_unnamed_extra_data_var = $v;
     }
