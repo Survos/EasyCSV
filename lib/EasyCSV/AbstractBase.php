@@ -118,6 +118,14 @@ abstract class AbstractBase
         $this->_headers = $header;
         $this->createFields($header);
         $this->_header_count = count($header);
-
     }
+
+    public function getLineCount()
+    {
+        $lines_command = sprintf('wc -l %s', $this->_path);
+        $lines = system($lines_command);
+        return $lines;
+    }
+
+
 }
