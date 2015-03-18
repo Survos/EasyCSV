@@ -60,14 +60,22 @@ class Reader extends AbstractBase
             } else {
               if (count($row) <> $this->_header_count) {
                 if ($this->_unnamed_extra_data_var) {
-                    $normal = array_slice($row, 0, $this->_header_count);
-                    $ret = array_combine($this->_headers, $normal);
-                    $ret[$this->_unnamed_extra_data_var] = array_slice($row, $this->_header_count);
-                    return $ret;
+                    try {
+                        $normal = array_slice($row, 0, $this->_header_count);
+                        $ret[$this->_unnamed_extra_data_var] = array_slice($row, $this->_header_count);
+                        return $ret;
+                        // throw new \Exception("Bad Data, wrong number of rows");
+                    }
+                    catch (\Exception $e)
+                    {
+                        $this->_has_error = true;
+                        $this->_error = "Bad Data, wrong number of columns";
+                        return $row;
+                    }
 
                 } else {
                     $this->_has_error = true;
-                    $this->_error = "Bad Data, wrong number of rows";
+                    $this->_error = "Bad Data, wrong number of columns, define unnamedExtraDataVar";
                     // throw new \Exception("Bad Data, wrong number of rows");
                     return $row;
                 }
@@ -147,6 +155,13 @@ class Reader extends AbstractBase
 
     public function getError() {
       return $this->_error;
+    }
+
+    public function advanceToRow($rowNumber)
+    {
+        while ($this->getLineNumber() < $rowNumber) {
+            $this->getRow();
+        }
     }
 
     public function getAll()
