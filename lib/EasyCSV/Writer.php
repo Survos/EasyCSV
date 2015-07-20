@@ -7,30 +7,34 @@ class Writer extends AbstractBase
     public function __construct($path, $mode = 'w+')
     {
         parent::__construct($path, $mode);
-        $this->_line    = 0;
+        $this->_line = 0;
     }
 
     public function writeRow($row)
     {
+        die('x');
         if (is_string($row)) {
             $row = explode(',', $row);
             $row = array_map('trim', $row);
         }
 
         if ($this->getForceUtf8()) {
-            $row = array_map(function($key) {
+            $row = array_map(function ($key) {
                 return mb_check_encoding($key, 'UTF-8') ? $key : utf8_encode($key);
             }, $row);
         }
 
         // fix the DateTime object and arrays
-            $row = array_map(function($key) {
-                switch (gettype($key)) {
-                    case 'DateTime': return $key->format('c');
-                    case 'array': return \Survos\Lib\tt::is_numeric_array($key) ? join("|", $key) : json_encode($key);
-                    default: return $key;
-                }
-            }, $row);
+        $row = array_map(function ($key) {
+            switch (gettype($key)) {
+                case 'DateTime':
+                    return $key->format('c');
+                case 'array':
+                    return \Survos\Lib\tt::is_numeric_array($key) ? join("|", $key) : json_encode($key);
+                default:
+                    return $key;
+            }
+        }, $row);
 
         if ($this->_line == 0) {
             $columns = array_keys($row);
@@ -43,7 +47,8 @@ class Writer extends AbstractBase
             throw new \Exception(sprintf('Unexpected column%s found in line %d: %s',
                 count($unexpected) == 1 ? '' : 's', $this->_line, implode(', ', $unexpected)));
         }
-        return fputcsv($this->_handle, array_merge($this->_defaults, $row), $this->_delimiter, $this->_enclosure);
+        return $this->handle->fputcsv(array_merge($this->_defaults, $row), $this->_delimiter, $this->_enclosure);
+//from update        return $this->handle->fputcsv($row, $this->delimiter, $this->enclosure);
     }
 
     public function writeFromArray(array $array)
