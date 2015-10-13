@@ -27,15 +27,16 @@ class Writer extends AbstractBase
             $row = array_map(function($key) {
                 switch (gettype($key)) {
                     case 'DateTime': return $key->format('c');
-                    case 'array': return \Survos\Lib\tt::is_numeric_array($key) ? join("|", $key) : json_encode($key);
+                    case 'array': return self::is_numeric_array($key) ? join("|", $key) : json_encode($key);
                     default: return $key;
                 }
             }, $row);
 
         if ($this->_line == 0) {
             $columns = array_keys($row);
+            $columnNames = $this->_codified_fields ? array_map('self::display_to_code', $columns) : $columns;
             $this->_defaults = array_fill_keys($columns, '');
-            fputcsv($this->_handle, $columns, $this->_delimiter, $this->_enclosure);
+            fputcsv($this->_handle, $columnNames, $this->_delimiter, $this->_enclosure);
         }
         $this->_line++;
         $unexpected = array_diff(array_keys($row), array_keys($this->_defaults));
@@ -57,4 +58,51 @@ class Writer extends AbstractBase
     {
         return $this->_line;
     }
+
+    // copied from Tt.php
+###########################
+    static function display_to_code( $name, $max_length = 0 ) {
+        static $from = array(
+            '/[\xc0-\xc5\xe0-\xe5]/',
+            '/[\xc6\xe6]/',
+            '/[\xc7\xe7]/',
+            '/[\xc8-\xcb\xe8-\xeb]/',
+            '/[\xcc-\xcf\xec-\xef]/',
+            '/[\xd0\xde\xf0\xfe]/',
+            '/[\xd1\xf1]/',
+            '/[\xd2-\xd6\xd8\xf2-\xf6\xf8]/',
+            '/[\xd9-\xdc\xf9-\xfc]/',
+            '/[\xdd\xfd\xff]/',
+            '/[\xdf]/'
+        );
+        static $to = array(
+            'a',
+            'ae',
+            'c',
+            'e',
+            'i',
+            'th',
+            'n',
+            'o',
+            'u',
+            'y',
+            'ss'
+        );
+        $name = preg_replace($from, $to, $name); # remove accents
+        # Lowercase and change non-alphanumerics to underscores:
+        $name = preg_replace('/[^a-z0-9]+/', '_', strtolower($name));
+        if ($max_length) $name = substr($name, 0, $max_length);
+        $name = preg_replace('/_$/', '', $name); # trim final underscore, if any
+        $name = preg_replace('/^_/', '', $name); # trim first underscore, if any
+        if ($max_length)
+        {
+            $name = substr($name, 0, $max_length);
+        }
+        return $name;
+    }
+
+    static function is_numeric_array($a) {
+        return is_array($a) and array_keys($a) === range(0, count($a) - 1);
+    }
+
 }
