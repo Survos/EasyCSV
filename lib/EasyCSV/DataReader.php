@@ -13,7 +13,7 @@ class DataReader extends Reader
     public function __construct($csv_text)
     {
         // create a temporary file, then run this through the normal reader
-        file_put_contents($path = '/tmp/' . md5($csv_text), $csv_text); // hack! How do I create a temporary file
+        file_put_contents($path = tempnam(sys_get_temp_dir(), 'import_csv'), $csv_text);
         parent::__construct($path);
     }
 
