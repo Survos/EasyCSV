@@ -2,20 +2,25 @@
 
 namespace EasyCSV;
 
-use EasyCSV\Field;
-
 class DataReader extends Reader
 {
-    private $_line;
-    private $_as_array=false;
-    private $_has_error = false;
+    /** @var string */
+    private $tempFile;
 
+    /**
+     * DataReader constructor.
+     * @param string $csv_text
+     */
     public function __construct($csv_text)
     {
         // create a temporary file, then run this through the normal reader
-        file_put_contents($path = tempnam(sys_get_temp_dir(), 'import_csv'), $csv_text);
-        parent::__construct($path);
+        $this->tempFile = tempnam(sys_get_temp_dir(), 'import_csv');
+        file_put_contents($this->tempFile, $csv_text);
+        parent::__construct($this->tempFile);
     }
 
-
+    public function __destruct()
+    {
+        @unlink($this->tempFile);
+    }
 }
