@@ -44,7 +44,8 @@ class Writer extends AbstractBase
             throw new \Exception(sprintf('Unexpected column%s found in line %d: %s',
                 count($unexpected) == 1 ? '' : 's', $this->_line, implode(', ', $unexpected)));
         }
-        return fputcsv($this->_handle, array_merge($this->_defaults, $row), $this->_delimiter, $this->_enclosure);
+        $result = fputcsv($this->_handle, $output=array_values(array_merge($this->_defaults, $row)), $this->_delimiter, $this->_enclosure);
+        return $result;
     }
 
     public function writeFromArray(array $array)

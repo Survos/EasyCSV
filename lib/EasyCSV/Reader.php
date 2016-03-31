@@ -9,6 +9,7 @@ class Reader extends AbstractBase
     private $_line;
     private $_as_array=false;
     private $_has_error = false;
+    private $fields = null;
 
     public function __construct($path, $mode = 'r+')
     {
