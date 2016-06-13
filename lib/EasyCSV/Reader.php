@@ -118,7 +118,7 @@ class Reader extends AbstractBase
     // we need to preserve column name, for compatibility with EasyCSV.
     for ($c=0; $c < count($data); $c++) {
         $column_name = $data[$c];
-        $field_name = \Survos\Lib\tt::display_to_code(
+        $field_name = self::display_to_code(
             // insert underscores before camel caps
             preg_replace('/(?<=[a-z])(?=[A-Z])/', '_', $column_name)
         );
@@ -186,5 +186,46 @@ class Reader extends AbstractBase
     public function asArray() {
       return $this->_as_array;
     }
+
+###########################
+    static function display_to_code( $name, $max_length = 0 ) {
+        static $from = array(
+            '/[\xc0-\xc5\xe0-\xe5]/',
+            '/[\xc6\xe6]/',
+            '/[\xc7\xe7]/',
+            '/[\xc8-\xcb\xe8-\xeb]/',
+            '/[\xcc-\xcf\xec-\xef]/',
+            '/[\xd0\xde\xf0\xfe]/',
+            '/[\xd1\xf1]/',
+            '/[\xd2-\xd6\xd8\xf2-\xf6\xf8]/',
+            '/[\xd9-\xdc\xf9-\xfc]/',
+            '/[\xdd\xfd\xff]/',
+            '/[\xdf]/'
+        );
+        static $to = array(
+            'a',
+            'ae',
+            'c',
+            'e',
+            'i',
+            'th',
+            'n',
+            'o',
+            'u',
+            'y',
+            'ss'
+        );
+        $name = preg_replace($from, $to, $name); # remove accents
+        # Lowercase and change non-alphanumerics to underscores:
+        $name = preg_replace('/[^a-z0-9]+/', '_', strtolower($name));
+        if ($max_length) $name = substr($name, 0, $max_length);
+        $name = preg_replace('/_$/', '', $name); # trim final underscore, if any
+        $name = preg_replace('/^_/', '', $name); # trim first underscore, if any
+        if ($max_length)
+        {
+            $name = substr($name, 0, $max_length);
+        }
+        return $name;
+    }    
 
 }
