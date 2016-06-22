@@ -192,47 +192,4 @@ class Field {
 		return $name;
 	}
 
-###########################
-	static function name_to_code( $name, $max_length = 0, $allowedChars='') {
-		# New version of display_to_code(), using hyphens
-		static $from = array(
-			'/[\xc0-\xc5\xe0-\xe5]/',
-			'/[\xc6\xe6]/',
-			'/[\xc7\xe7]/',
-			'/[\xc8-\xcb\xe8-\xeb]/',
-			'/[\xcc-\xcf\xec-\xef]/',
-			'/[\xd0\xde\xf0\xfe]/',
-			'/[\xd1\xf1]/',
-			'/[\xd2-\xd6\xd8\xf2-\xf6\xf8]/',
-			'/[\xd9-\xdc\xf9-\xfc]/',
-			'/[\xdd\xfd\xff]/',
-			'/[\xdf]/'
-		);
-		static $to = array(
-			'a',
-			'ae',
-			'c',
-			'e',
-			'i',
-			'th',
-			'n',
-			'o',
-			'u',
-			'y',
-			'ss'
-		);
-		// old version
-		if ($allowedChars === true) {
-			$allowedChars = '.';
-		}
-		$name = preg_replace($from, $to, $name); # remove accents
-		# Lowercase and change non-alphanumerics to hyphens:
-		$name = preg_replace("/[^a-z0-9$allowedChars]+/", '-', strtolower($name));
-		$name = preg_replace('/^-/', '', $name); # trim initial hyphen, if any
-		$name = preg_replace('/\b(\w)-(?=\w\b)/', '$1', $name); # scrunch things like 'u-s-v-i'
-		if ($max_length) $name = substr($name, 0, $max_length);
-		$name = preg_replace('/-$/', '', $name); # trim final hyphen, if any
-		return $name;
-	}
-
 }
